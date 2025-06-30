@@ -86,7 +86,7 @@ function Alerts() {
         <div className="w-full text-green-200 flex flex-col lg:flex-row gap-6">
             {/* LEFT: Create alert */}
             <div className="flex-1">
-                <h1 className="text-2xl font-bold mb-3">Add Alert</h1>
+                <h1 className="text-2xl font-bold mb-3">Alert</h1>
                 <input
                     type="text"
                     placeholder="Alert message..."
@@ -108,9 +108,10 @@ function Alerts() {
                 </button>
             </div>
 
+
             {/* RIGHT: Pending alerts */}
             <div className="flex-1">
-                <h2 className="text-2xl font-bold mb-3">Pending Alerts</h2>
+                <h1 className="text-2xl font-bold mb-3">Pending Alerts</h1>
                 <ul className="space-y-3">
                     {alerts.map(alert => (
                         <li key={alert.id} className={`p-3 rounded border shadow ${getBgColor(alert.status)}`}>

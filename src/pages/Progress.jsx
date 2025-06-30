@@ -53,7 +53,7 @@ function Progress() {
     };
 
     return (
-        <div className="w-full max-w-xl text-left px-6">
+        <div className="w-full max-w-xl text-left">
             <h1 className="text-2xl font-bold text-green-200 mb-4">Progress Tracker 📈</h1>
 
             <div className="flex gap-2 mb-6">

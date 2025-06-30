@@ -60,10 +60,10 @@ function Notes() {
     };
 
     return (
-        <div className="w-full px-6">
-            <div className="flex flex-col md:flex-row items-stretch gap-10 min-h-[300px]">
+        <div className="w-full ">
+            <div className="flex flex-col md:flex-row items-stretch gap-6 min-h-[300px]">
                 {/* LEFT: Input Form Section */}
-                <div className="flex-1 max-w-xl text-left">
+                <div className="flex-1 max-w-162 text-left">
                     <h1 className="text-2xl font-bold text-green-200 mb-4">Notes 📝</h1>
                     <div className="flex flex-col gap-2 mb-6">
                         <input
@@ -88,7 +88,6 @@ function Notes() {
                     </div>
                 </div>
 
-                <div className="hidden md:block w-2 bg-green-200 h-auto"></div>
 
                 {/* RIGHT: Notes List Section */}
                 <div className="flex-1 max-w-xl text-right w-full">
