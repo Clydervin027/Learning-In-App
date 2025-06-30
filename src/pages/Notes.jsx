@@ -75,7 +75,7 @@ function Notes() {
                         <textarea
                             value={newText}
                             onChange={(e) => setNewText(e.target.value)}
-                            rows={3}
+                            rows={10}
                             className="border text-green-200 border-green-200 rounded p-2"
                             placeholder="Write your note here..."
                         />
