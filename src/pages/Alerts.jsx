@@ -119,7 +119,7 @@ function Alerts() {
                                 <div>
                                     <p>
                                         {alert.status === 'now'
-                                            ? `⏰ ${alert.message.replace('is one day left', 'is now!')}`
+                                            ? `⏰ ${alert.message.replace('is now!', 'schedule time remaining')}`
                                             : alert.message}
                                     </p>
                                     <small className="text-green-300">

@@ -112,40 +112,53 @@ app.get('/alerts', (req, res) => {
         const alertTime = new Date(alert.deadline);
         const diff = alertTime - now;
 
-        let status = 'pending';
-        if (diff <= 0) {
+        let status = 'upcoming';
+        let messageStatus = '';
+
+        if (diff < -60000) { // more than 1 min ago
+            status = 'done';
+            messageStatus = 'past event';
+        } else if (
+            now.toDateString() === alertTime.toDateString()
+            && Math.abs(alertTime - now) < 3600000
+        ) {
             status = 'now';
-        } else if (diff <= 86400000) {
+            messageStatus = "It's now";
+        } else if (diff <= 86400000 && diff > 0) {
             status = '1-day-left';
+            messageStatus = 'is one day left';
         } else {
             status = 'pending';
+            messageStatus = 'upcoming event';
         }
 
-        // Once the alert is past for some time, mark as done
-        if (diff < -3600000) { // more than 1 hour ago
-            status = 'done';
-        }
-
-        return { ...alert, status };
+        return {
+            ...alert,
+            status,
+            message: `${alert.message} ${messageStatus}`
+        };
     });
 
     res.json(alerts);
 });
 
-app.post('/alerts', (req, res) => {
-    const { message, deadline, source } = req.body;
-    if (!message || !deadline) return res.status(400).json({ error: 'Message and deadline are required.' });
+app.post('/schedule', (req, res) => {
+    const { title, deadline } = req.body;
+    if (!title || !deadline) return res.status(400).json({ error: 'Title and deadline are required' });
 
-    const newAlert = {
-        id: Date.now(),
-        message,
+    const newSchedule = { id: Date.now(), title, deadline };
+    schedule.push(newSchedule);
+
+    // Fix alert message here
+    alerts.push({
+        id: Date.now() + 1,
+        message: `${title}`, // message is just title for now
         deadline,
-        source: source || 'manual',
+        source: 'schedule',
         status: 'pending'
-    };
+    });
 
-    alerts.push(newAlert);
-    res.status(201).json(newAlert);
+    res.status(201).json(newSchedule);
 });
 
 app.delete('/alerts/:id', (req, res) => {

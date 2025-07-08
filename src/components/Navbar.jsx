@@ -13,11 +13,11 @@ function Navbar() {
     ];
 
     return (
-        <nav className="bg-purple-950 shadow p-4 border-5 border-green-200 border-double rounded-lg">
+        <nav className="bg-purple-700 shadow p border-5 border-green-200 border-double rounded-lg">
             <div className="flex justify-start">
-                <h1 className="justify-start text-green-200 text-3x1 font-bold">IN-APP</h1>
+                <h1 className="ml-4 mt-4 p-2 bg-purple-900 border-3 rounded-full justify-start text-green-200 text-3x1 font-bold">IN-APP</h1>
             </div>
-            <ul className="flex space-x-6 justify-end">
+            <ul className="flex space-x-6 justify-end mr-4">
                 {links.map(link => (
                     <li key={link.to}>
                         <Link
