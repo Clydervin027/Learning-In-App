@@ -75,12 +75,11 @@ app.post('/schedule', (req, res) => {
     // Also add alert associated with schedule
     alerts.push({
         id: Date.now() + 1,
-        message: `${title} is one day left`,
+        message: title, // just store the title
         deadline,
         source: 'schedule',
         status: 'pending'
     });
-
     res.status(201).json(newSchedule);
 });
 app.delete('/schedule/:id', (req, res) => {
@@ -112,30 +111,27 @@ app.get('/alerts', (req, res) => {
         const alertTime = new Date(alert.deadline);
         const diff = alertTime - now;
 
-        let status = 'upcoming';
-        let messageStatus = '';
+        let status = 'pending';
+        let suffix = 'upcoming event';
 
-        if (diff < -60000) { // more than 1 min ago
+        if (diff < -60000) {
             status = 'done';
-            messageStatus = 'past event';
+            suffix = 'past event';
         } else if (
-            now.toDateString() === alertTime.toDateString()
-            && Math.abs(alertTime - now) < 3600000
+            now.toDateString() === alertTime.toDateString() &&
+            Math.abs(alertTime - now) < 3600000
         ) {
             status = 'now';
-            messageStatus = "It's now";
+            suffix = "It's now";
         } else if (diff <= 86400000 && diff > 0) {
             status = '1-day-left';
-            messageStatus = 'is one day left';
-        } else {
-            status = 'pending';
-            messageStatus = 'upcoming event';
+            suffix = 'is one day left';
         }
 
         return {
             ...alert,
             status,
-            message: `${alert.message} ${messageStatus}`
+            message: `${alert.message} ${suffix}`
         };
     });
 
