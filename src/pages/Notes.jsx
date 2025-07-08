@@ -6,6 +6,7 @@ function Notes() {
     const [newTitle, setNewTitle] = useState('');
     const [newText, setNewText] = useState('');
     const [editingId, setEditingId] = useState(null);
+    const [originalNote, setOriginalNote] = useState(null);
 
     // Fetch notes from the server on initial load
     useEffect(() => {
@@ -15,6 +16,16 @@ function Notes() {
     }, []);
 
     const addOrEditNote = async () => {
+        if (editingId && !newTitle.trim() && !newText.trim()) {
+            if (originalNote) {
+                setNewTitle(originalNote.title);
+                setNewText(originalNote.text);
+            }
+            setEditingId(null);
+            setOriginalNote(null);
+            return;
+        }
+
         if (!newTitle.trim() || !newText.trim()) return;
 
         if (editingId) {
@@ -57,6 +68,7 @@ function Notes() {
         setNewTitle(note.title);
         setNewText(note.text);
         setEditingId(note.id);
+        setOriginalNote(note);
     };
 
     return (
