@@ -67,3 +67,108 @@ app.delete('/progress/:id', (req, res) => {
 app.get('/schedule', (req, res) => res.json(schedule));
 app.post('/schedule', (req, res) => {
     const { title, deadline } = req.body;
+    if (!title || !deadline) return res.status(400).json({ error: 'Title and deadline are required' });
+
+    const newSchedule = { id: Date.now(), title, deadline };
+    schedule.push(newSchedule);
+
+    alerts.push({
+        id: Date.now() + 1,
+        message: title, // store only title
+        deadline,
+        source: 'schedule',
+        status: 'pending'
+    });
+
+    res.status(201).json(newSchedule);
+});
+app.delete('/schedule/:id', (req, res) => {
+    const { id } = req.params;
+    const index = schedule.findIndex(s => s.id == id);
+    if (index === -1) return res.status(404).json({ error: 'Schedule not found' });
+    const deleted = schedule.splice(index, 1);
+    res.json(deleted[0]);
+});
+
+// -------- Alerts --------
+app.get('/alerts', (req, res) => {
+    const now = new Date();
+
+    const enrichedAlerts = alerts.map(alert => {
+        const deadlineTime = new Date(alert.deadline);
+        const diff = deadlineTime - now;
+
+        let status = 'pending';
+        let suffix = 'upcoming event';
+
+        if (diff < -60000) {
+            status = 'done';
+            suffix = 'past event';
+        } else if (
+            now.toDateString() === deadlineTime.toDateString() &&
+            Math.abs(diff) < 3600000
+        ) {
+            status = 'now';
+            suffix = "It's now";
+        } else if (diff <= 86400000 && diff > 0) {
+            status = '1-day-left';
+            suffix = 'is one day left';
+        }
+
+        return {
+            ...alert,
+            status,
+            message: `${alert.message} ${suffix}`
+        };
+    });
+
+    res.json(enrichedAlerts);
+});
+
+app.post('/alerts', (req, res) => {
+    const { message, deadline, source } = req.body;
+    if (!message || !deadline) return res.status(400).json({ error: 'Message and deadline are required.' });
+
+    const newAlert = {
+        id: Date.now(),
+        message, // plain message
+        deadline,
+        source: source || 'manual',
+        status: 'pending'
+    };
+
+    alerts.push(newAlert);
+    res.status(201).json(newAlert);
+});
+
+app.delete('/alerts/:id', (req, res) => {
+    const { id } = req.params;
+    alerts = alerts.filter(alert => alert.id != id);
+    res.status(204).send();
+});
+
+// -------- Alert Auto Updater --------
+setInterval(() => {
+    const now = new Date();
+    alerts.forEach(alert => {
+        const diff = new Date(alert.deadline) - now;
+
+        if (diff > 86400000) {
+            alert.status = 'pending';
+        } else if (diff <= 86400000 && diff > 0) {
+            alert.status = '1-day-left';
+        } else if (
+            diff <= 0 &&
+            now.toDateString() === new Date(alert.deadline).toDateString()
+        ) {
+            alert.status = 'now';
+        } else {
+            alert.status = 'done';
+        }
+    });
+}, 60000);
+
+// -------- Start Server --------
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+});
