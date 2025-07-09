@@ -74,7 +74,7 @@ app.post('/schedule', (req, res) => {
 
     alerts.push({
         id: Date.now() + 1,
-        message: title, // store only title
+        message: title, // ✅ title is saved as message
         deadline,
         source: 'schedule',
         status: 'pending'
@@ -99,26 +99,26 @@ app.get('/alerts', (req, res) => {
         const diff = deadlineTime - now;
 
         let status = 'pending';
-        let suffix = 'upcoming event';
+
 
         if (diff < -60000) {
             status = 'done';
-            suffix = 'past event';
+
         } else if (
             now.toDateString() === deadlineTime.toDateString() &&
             Math.abs(diff) < 3600000
         ) {
             status = 'now';
-            suffix = "It's now";
+
         } else if (diff <= 86400000 && diff > 0) {
             status = '1-day-left';
-            suffix = 'is one day left';
+
         }
 
         return {
             ...alert,
             status,
-            message: `${alert.message} ${suffix}`
+            suffix // send suffix separately
         };
     });
 

@@ -7,7 +7,7 @@ function Alerts() {
     const [alerts, setAlerts] = useState([]);
     const [, forceUpdate] = useState(0);
 
-    // Fetch alerts and show relevant popups
+
     const fetchAlerts = async () => {
         try {
             const res = await axios.get('http://localhost:3000/alerts');
@@ -17,7 +17,7 @@ function Alerts() {
         }
     };
 
-    // Initial fetch and periodic update every 60 seconds
+
     useEffect(() => {
         fetchAlerts();
         const interval = setInterval(fetchAlerts, 60000);
@@ -27,7 +27,7 @@ function Alerts() {
 
     useEffect(() => {
         const timer = setInterval(() => {
-            forceUpdate(n => n + 1); // Force re-render to update countdowns
+            forceUpdate(n => n + 1);
         }, 1000);
 
         return () => clearInterval(timer);
@@ -43,7 +43,7 @@ function Alerts() {
             });
             setMessage('');
             setDeadline('');
-            fetchAlerts(); // refresh alert list after adding
+            fetchAlerts();
         } catch (err) {
             console.error('Error adding alert:', err);
         }
@@ -52,7 +52,7 @@ function Alerts() {
     const handleDeleteAlert = async (id) => {
         try {
             await axios.delete(`http://localhost:3000/alerts/${id}`);
-            setAlerts(prev => prev.filter(alert => alert.id !== id));
+            setAlerts(prev => prev.filter(item => item.id !== id));
         } catch (err) {
             console.error('Error deleting alert:', err);
         }
@@ -80,6 +80,15 @@ function Alerts() {
         const seconds = Math.floor((diff / 1000) % 60);
 
         return `⏳ ${days}d ${hours}h ${minutes}m ${seconds}s left`;
+    };
+
+    const statusLabel = (status) => {
+        switch (status) {
+            case '1-day-left': return '⚠️ One day left';
+            case 'now': return '⏰ It\'s now';
+            case 'done': return '✅ Past event';
+            default: return '🔔 Upcoming event';
+        }
     };
 
     return (
@@ -113,22 +122,18 @@ function Alerts() {
             <div className="flex-1">
                 <h1 className="text-2xl font-bold mb-3">Pending Alerts</h1>
                 <ul className="space-y-3">
-                    {alerts.map(alert => (
-                        <li key={alert.id} className={`p-3 rounded border shadow ${getBgColor(alert.status)}`}>
+                    {alerts.map(item => (
+                        <li key={item.id} className={`p-3 rounded border shadow ${getBgColor(item.status)}`}>
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <p>
-                                        {alert.status === 'now'
-                                            ? `⏰ ${alert.message.replace('is now!', 'schedule time remaining')}`
-                                            : alert.message}
-                                    </p>
+                                    <p>{item.status === 'pending' ? `🔔 ${item.message} — ${item.suffix}` : `${statusLabel(item.status)} — ${item.message}`}</p>
                                     <small className="text-green-300">
-                                        🕒 {alert.deadline} <br />
-                                        {getCountdown(alert.deadline)}
+                                        🕒 {item.deadline} <br />
+                                        {getCountdown(item.deadline)}
                                     </small>
                                 </div>
                                 <button
-                                    onClick={() => handleDeleteAlert(alert.id)}
+                                    onClick={() => handleDeleteAlert(item.id)}
                                     className="text-red-300 hover:text-red-500"
                                 >
                                     ✖
